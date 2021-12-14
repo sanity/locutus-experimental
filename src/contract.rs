@@ -1,3 +1,4 @@
+use serde::{Serialize, Deserialize};
 use serde_derive::{Serialize, Deserialize};
 
 /// The Value associated with this contract
@@ -34,4 +35,15 @@ pub trait ContractKey {
     fn merge(payload: &Payload, existing_value: &Value, new_value: &Value) -> Option<Value>;
 
     // TODO: Should existing_value be mutated in-place rather than creating a new Value?
+}
+
+pub struct Signed { // 'static is probably not what's needed here
+    pub serialized : Vec<u8>,
+    pub signature: RSASignature,
+}
+
+impl<T : Serialize + Deserialize<'static>> Signed {
+    fn get(&self) -> T {
+        todo!();
+    }
 }

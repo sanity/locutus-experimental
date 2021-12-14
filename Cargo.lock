@@ -3,6 +3,12 @@
 version = 3
 
 [[package]]
+name = "arrayvec"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
+
+[[package]]
 name = "autocfg"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -115,6 +121,7 @@ name = "locutus-experimental"
 version = "0.1.0"
 dependencies = [
  "rsa",
+ "rust_decimal",
  "serde",
  "serde_derive",
 ]
@@ -283,6 +290,17 @@ dependencies = [
  "rand",
  "subtle",
  "zeroize",
+]
+
+[[package]]
+name = "rust_decimal"
+version = "1.18.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "71b5a9625a7e6060b23db692facf49082cc78889a7e6ac94a735356ae49db4b0"
+dependencies = [
+ "arrayvec",
+ "num-traits",
+ "serde",
 ]
 
 [[package]]

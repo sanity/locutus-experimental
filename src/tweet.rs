@@ -2,11 +2,7 @@ use crate::contract::*;
 
 struct TweetContract {}
 
-impl TweetContract {
-
-}
-
-struct TweetValue {
+pub struct TweetValue {
     number : u32,
     content : Vec<u8>,
     signature : RSASignature,
