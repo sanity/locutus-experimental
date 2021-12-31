@@ -1,5 +1,4 @@
-use serde::{Serialize, Deserialize};
-use serde_derive::{Serialize, Deserialize};
+use serde_derive::{Deserialize, Serialize};
 
 /// The Value associated with this contract
 pub type Value = Vec<u8>;
@@ -9,16 +8,19 @@ pub type Value = Vec<u8>;
 pub type Payload = Vec<u8>;
 
 #[derive(Serialize, Deserialize)]
-pub struct RSAPublicKey { }
+pub struct PublicKey {}
 
-impl RSAPublicKey {
-    pub fn verify_signature(&self, signature : RSASignature, content : Vec<u8>) -> bool {
+impl PublicKey {
+    pub fn verify_signature(&self, signature: Signature, content: Vec<u8>) -> bool {
         todo!();
     }
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct RSASignature { }
+pub struct Signature {}
+
+#[derive(Serialize, Deserialize)]
+pub struct Hash {}
 
 pub trait ContractKey {
     /// Determine whether this value is valid for this contract
@@ -35,15 +37,4 @@ pub trait ContractKey {
     fn merge(payload: &Payload, existing_value: &Value, new_value: &Value) -> Option<Value>;
 
     // TODO: Should existing_value be mutated in-place rather than creating a new Value?
-}
-
-pub struct Signed { // 'static is probably not what's needed here
-    pub serialized : Vec<u8>,
-    pub signature: RSASignature,
-}
-
-impl<T : Serialize + Deserialize<'static>> Signed {
-    fn get(&self) -> T {
-        todo!();
-    }
 }
