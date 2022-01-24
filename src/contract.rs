@@ -1,40 +1,50 @@
 use serde_derive::{Deserialize, Serialize};
 
-/// The Value associated with this contract
-pub type Value = Vec<u8>;
-
-/// A payload associated with this contract, considered part of the contract
-/// when determining the contract's location
-pub type Payload = Vec<u8>;
-
-#[derive(Serialize, Deserialize)]
-pub struct PublicKey {}
-
-impl PublicKey {
-    pub fn verify_signature(&self, signature: Signature, content: Vec<u8>) -> bool {
-        todo!();
-    }
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct Signature {}
-
-#[derive(Serialize, Deserialize)]
 pub struct Hash {}
 
-pub trait ContractKey {
-    /// Determine whether this value is valid for this contract
-    fn validate_value(payload: &Payload, value: &Value) -> bool;
+pub struct Parameters(Vec<u8>);
 
-    /// Merges two values, both of which will already have been validated.
-    ///
-    /// The contract implementation must guarantee that merges have the commutative property
-    ///     merge(a, b) == merge(b, a) and
-    ///     merge(merge(a, b), c) == merge(a, merge(b, c)) == merge(merge(a, c), b)
-    /// The implementation must also be able to detect whether a value has already been merged, ie:
-    ///     merge(merge(a, b), b) == None
-    /// Will return Some(the merged value) or None
-    fn merge(payload: &Payload, existing_value: &Value, new_value: &Value) -> Option<Value>;
+pub struct State(Vec<u8>);
 
-    // TODO: Should existing_value be mutated in-place rather than creating a new Value?
+pub struct Response(Vec<u8>);
+
+pub struct Message(Vec<u8>);
+
+pub struct Query(Vec<u8>);
+
+pub struct StateSummary(Vec<u8>);
+
+pub struct StateDelta(Vec<u8>);
+
+pub enum ContractKeyResult {}
+
+pub struct Contract {}
+
+pub trait ContractInterface {
+    // Validation functions
+    fn validate_state(parameters: &Parameters, state: &State) -> bool;
+
+    fn validate_message(parameters: &Parameters, message: &Message) -> bool;
+
+    /// if the state has been changed persist the changes
+    fn update_state(parameters: &Parameters, state: &mut State, message: Message) -> bool;
+
+    /// relay this message to each of the contract + parameters tuple given back by the function
+    fn related_contracts(parameters: &Parameters, message: &Message)
+        -> Vec<(Contract, Parameters)>;
+
+    // node layer:
+    // These functions facilitate more efficient synchronization of state between peers
+    fn summarize_state(parameters: &Parameters, state: &State) -> StateSummary;
+
+    fn get_state_delta(
+        parameters: &Parameters,
+        state: &State,
+        delta_to: StateSummary,
+    ) -> StateDelta;
+
+    fn apply_state_delta(parameters: &Parameters, state: &mut State, delta: &StateDelta) -> bool;
+
+    // appliction layer:
+    fn request(parameters: &Parameters, query: &Query) -> Response;
 }
