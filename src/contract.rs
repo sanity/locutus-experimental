@@ -48,3 +48,17 @@ pub trait ContractInterface {
     // appliction layer:
     fn request(parameters: &Parameters, query: &Query) -> Response;
 }
+
+impl Hash {
+    pub fn new(bytes: &Vec<u8>) -> Self {
+        todo!()
+    }
+
+    pub fn add(&mut self, bytes: &Vec<u8>) -> Self {
+        todo!()
+    }
+
+    pub fn as_bytes(&self) -> Vec<u8> {
+        todo!()
+    }
+}
