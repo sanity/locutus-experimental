@@ -7,24 +7,36 @@ use rust_decimal::Decimal;
 mod convert;
 
 struct CurrencyState {
-    pub transactions: Vec<(WithBytes<(Transaction, Hash)>, Signature)>,
+    pub entries: Vec<Signed<WithRunningHash<Entry>>>,
 }
 
-struct Transaction {
-    sender: PublicKey,
-    receiver: PublicKey,
-    amount: Decimal,
-    balance: Decimal,
+struct Signed<T> {
+    pub signed_value : WithBytes<T>,
+    pub signature : Signature,
 }
 
-impl From<Vec<u8>> for Transaction {
+struct WithRunningHash<T> {
+    pub contents : T,
+    pub running_hash : Hash,
+}
+
+enum Entry {
+    Transaction {
+        sender: PublicKey,
+        receiver: PublicKey,
+        amount: Decimal,
+        balance: Decimal,
+    },
+}
+
+impl From<Vec<u8>> for Entry {
     fn from(bytes: Vec<u8>) -> Self {
         unimplemented!()
     }
 }
 
-impl From<Transaction> for Vec<u8> {
-    fn from(transaction: Transaction) -> Self {
+impl From<Entry> for Vec<u8> {
+    fn from(entry: Entry) -> Self {
         unimplemented!()
     }
 }
@@ -44,21 +56,31 @@ impl ContractInterface for CurrencyState {
         // A hash incorporating all transactions so far to lock-in history
         let mut running_hash = Hash::new(&Vec::new());
         let mut running_balance = Decimal::new(0, 0);
-        for transaction in state.transactions.iter() {
-            let transaction_hash = Hash::new(&transaction.0.bytes);
-            running_hash.add(&transaction_hash.as_bytes());
+        for entry in state.entries.iter() {
+            let entry_hash = Hash::new(&entry.signed_value.bytes);
+            running_hash.add(&entry_hash.as_bytes());
             if parameters
                 .public_key
-                .verify_signature(&transaction.1, &running_hash.as_bytes()) {
+                .verify_signature(&entry.signature, &running_hash.as_bytes())
+            {
                 return false;
             }
-            // Should use structs instead of tuples
-            running_balance += transaction.0.value.0.amount;
-            if running_balance != transaction.0.value.0.balance {
-                return false;
+            // Should use structs instead of tuples?
+            match &entry.signed_value.value.contents {
+                Entry::Transaction {
+                    sender,
+                    receiver,
+                    amount,
+                    balance,
+                } => {
+                    running_balance += amount;
+                    if &running_balance != balance {
+                        return false;
+                    }
+                }
             }
         }
-        todo!()
+        true
     }
 
     fn validate_message(parameters: &Parameters, message: &Message) -> bool {
@@ -96,3 +118,9 @@ impl ContractInterface for CurrencyState {
         todo!()
     }
 }
+
+/*
+A-B-C-D
+
+A-B-C-E
+*/
