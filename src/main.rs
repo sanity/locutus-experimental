@@ -1,3 +1,4 @@
+#![feature(format_args_capture)]
 // TODO: Remove
 #![allow(dead_code, unused_variables)]
 

@@ -1,3 +1,4 @@
+use rust_decimal::Decimal;
 use serde_derive::{Deserialize, Serialize};
 
 pub struct Hash {}
@@ -22,7 +23,7 @@ pub struct Contract {}
 
 pub trait ContractInterface {
     // Validation functions
-    fn validate_state(parameters: &Parameters, state: &State) -> bool;
+    fn validate_state(parameters: &Parameters, state: &State) -> Result<(), String>;
 
     fn validate_message(parameters: &Parameters, message: &Message) -> bool;
 
