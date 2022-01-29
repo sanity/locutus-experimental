@@ -13,6 +13,21 @@ pub struct Signature {}
 
 #[derive(Serialize, Deserialize)]
 pub struct Hash {}
+
+impl Hash {
+    pub fn new(bytes: &Vec<u8>) -> Self {
+        todo!()
+    }
+
+    pub fn add(&mut self, bytes: &Vec<u8>) -> Self {
+        todo!()
+    }
+
+    pub fn as_bytes(&self) -> Vec<u8> {
+        todo!()
+    }
+}
+
 pub struct SigCheckFailed {}
 
 pub struct WithBytes<T> {
@@ -31,4 +46,14 @@ impl PublicKey {
     pub(crate) fn verify(&self, signature: &Signature, to_verify: &[u8]) -> bool {
         todo!()
     }
+}
+pub struct Signed<T> {
+    pub signed_value: WithBytes<T>,
+    pub signature: Signature,
+}
+
+pub struct WithRunningHash<T> {
+    pub index: u64,
+    pub contents: T,
+    pub running_hash: Hash,
 }

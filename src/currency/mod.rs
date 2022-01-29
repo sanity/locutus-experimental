@@ -1,6 +1,8 @@
+use std::time::Instant;
+
 use crate::{
     contract::*,
-    util::{PublicKey, Signature, WithBytes},
+    util::*,
 };
 use rust_decimal::Decimal;
 
@@ -10,23 +12,18 @@ struct CurrencyState {
     pub entries: Vec<Signed<WithRunningHash<Entry>>>,
 }
 
-struct Signed<T> {
-    pub signed_value: WithBytes<T>,
-    pub signature: Signature,
-}
-
-struct WithRunningHash<T> {
-    pub index: u64,
-    pub contents: T,
-    pub running_hash: Hash,
-}
-
 enum Entry {
     Transaction {
         sender: PublicKey,
         receiver: PublicKey,
         amount: Decimal,
         balance: Decimal,
+    },
+    Witness {
+        hash_time: (Hash, Instant),
+        signature: Signature,
+        public_key: PublicKey,
+        predigree: Vec<(PublicKey, Signature)>,
     },
 }
 
@@ -69,7 +66,7 @@ impl ContractInterface for CurrencyState {
                 .public_key
                 .verify_signature(&entry.signature, &running_hash.as_bytes())
             {
-                return Result::Err("Signature check failed".to_string());
+                return Result::Err(format!("Signature check failed on entry {ix}"));
             }
             // Should use structs instead of tuples?
             match &entry.signed_value.value.contents {
@@ -82,10 +79,16 @@ impl ContractInterface for CurrencyState {
                     running_balance += amount;
                     if &running_balance != balance {
                         return Result::Err(format!(
-                            "Invalid balance, expected {running_balance}, got {balance}"
+                            "Invalid balance, expected {running_balance}, got {balance}, on entry {ix}"
                         ));
                     }
                 }
+                Entry::Witness {
+                    hash_time,
+                    signature,
+                    public_key,
+                    predigree,
+                } => {}
             }
         }
         Result::Ok(())

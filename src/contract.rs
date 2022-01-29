@@ -1,8 +1,5 @@
 use rust_decimal::Decimal;
 use serde_derive::{Deserialize, Serialize};
-
-pub struct Hash {}
-
 pub struct Parameters(Vec<u8>);
 
 pub struct State(Vec<u8>);
@@ -50,16 +47,4 @@ pub trait ContractInterface {
     fn request(parameters: &Parameters, query: &Query) -> Response;
 }
 
-impl Hash {
-    pub fn new(bytes: &Vec<u8>) -> Self {
-        todo!()
-    }
 
-    pub fn add(&mut self, bytes: &Vec<u8>) -> Self {
-        todo!()
-    }
-
-    pub fn as_bytes(&self) -> Vec<u8> {
-        todo!()
-    }
-}
