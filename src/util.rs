@@ -53,7 +53,11 @@ pub struct Signed<T> {
 }
 
 pub struct WithRunningHash<T> {
-    pub index: u64,
-    pub contents: T,
+    pub hashed_value: WithBytes<T>,
     pub running_hash: Hash,
+}
+
+pub struct Indexed<T> {
+    pub index: u64,
+    pub indexed_value: T,
 }

@@ -9,7 +9,7 @@ use rust_decimal::Decimal;
 mod convert;
 
 struct CurrencyState {
-    pub entries: Vec<Signed<WithRunningHash<Entry>>>,
+    pub entries: Vec<Signed<WithRunningHash<Indexed<Entry>>>>,
 }
 
 enum Entry {
@@ -55,9 +55,10 @@ impl ContractInterface for CurrencyState {
         let mut running_hash = Hash::new(&Vec::new());
         let mut running_balance = Decimal::new(0, 0);
         for (ix, entry) in state.entries.iter().enumerate() {
-            let entry_index = entry.signed_value.value.index;
-            if entry_index != ix as u64 {
-                return Result::Err(format!("Invalid index, expected {ix}, got {entry_index}"));
+            let indexed_entry = &entry.signed_value.value.hashed_value.value;
+            let indexed_entry_ix = indexed_entry.index;
+            if indexed_entry_ix != ix as u64 {
+                return Result::Err(format!("Invalid index, expected {ix}, got {indexed_entry_ix}"));
             }
 
             let entry_hash = Hash::new(&entry.signed_value.bytes);
@@ -69,7 +70,7 @@ impl ContractInterface for CurrencyState {
                 return Result::Err(format!("Signature check failed on entry {ix}"));
             }
             // Should use structs instead of tuples?
-            match &entry.signed_value.value.contents {
+            match &indexed_entry.indexed_value {
                 Entry::Transaction {
                     sender,
                     receiver,
