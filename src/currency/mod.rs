@@ -55,6 +55,7 @@ impl ContractInterface for CurrencyState {
         let mut running_hash = Hash::new(&Vec::new());
         let mut running_balance = Decimal::new(0, 0);
         for (ix, entry) in state.entries.iter().enumerate() {
+            // Definite code-smell in this long chain of struct field accesses
             let indexed_entry = &entry.signed_value.value.hashed_value.value;
             let indexed_entry_ix = indexed_entry.index;
             if indexed_entry_ix != ix as u64 {
